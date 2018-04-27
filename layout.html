@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="css/font-awesome.min.css" />
+		<link rel="stylesheet" type="text/css" href="js/bootstrap-3.3.7-dist/css/bootstrap.css" />
+		<script src="js/bootstrap-3.3.7-dist/js/jquery.min.3.2.1.js" type="text/javascript" charset="utf-8"></script>
+		<style type="text/css">
+			.header {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 8%;
+				/*background-image: url(images/header.jpg);*/
+			}
+			
+			.mainview {
+				position: absolute;
+				top: 8%;
+				left: 0;
+				width: 100%;
+				height: 92%;
+			}
+			
+			.headerimg {
+				height: 100%;
+				width: 100%;
+			}
+			
+			html {
+				overflow-x: hidden;
+				overflow-y: auto;
+				vertical-align: top;
+			}
+			
+			.userinfo {
+				position: absolute;
+				right: 0;
+				width: 150px;
+				bottom: 10%;
+				height: 60%;
+				background: transparent;
+				color: #FFFFFF;
+				font-size: 32px;
+			}
+			
+			.userinfo span {
+				left: 0;
+				color: #DDDDDD;
+				width: auto;
+				height: auto;
+			}
+			
+			.userinfo span:hover {
+				color: #FFFFFF;
+			}
+			
+			.userinfo span:before {
+				font-family: FontAwesome;
+				content: '\f2be';
+				font-size: 24px;
+			}
+			
+			.userinfo a {
+				font-size: 16px;
+				color: #DDDDDD;
+			}
+			
+			.userinfo a:hover {
+				color: #FFFFFF;
+				text-decoration: none;
+			}
+
+		</style>
+	</head>
+
+	<body>
+		<div id="header" class="header">
+
+			<img src="./images/header2.jpg" class="headerimg" />
+
+			<div class="userinfo">
+				<a title='当前用户' class='btn btn-inverse'>
+					<span>
+						<a id="userLoginName"></a>
+					</span>
+				</a>
+
+			</div>
+
+		</div>
+		<div id="mainview" class="mainview">
+			<iframe src="index.html" width="100%" height="100%" style="vertical-align:top;" frameborder="0" scrolling='no'></iframe>
+		</div>
+	</body>
+
+</html>
