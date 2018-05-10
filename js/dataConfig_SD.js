@@ -1,26 +1,215 @@
 var dataConfig = {
-	sceneUrl: 'http://localhost:8090/iserver/services/3D-ZhongTiaoShanSuiDao/rest/realspace',
+	sceneUrl: 'http://localhost:8090/iserver/services/3D-SuiDaomodel/rest/realspace',
 	cameraobj: {
-		heading: 0.4524677227269258,
-		pitch: -0.3371180128131013,
-		roll: 6.283185307121734,
-		x: -2623878.6953883013,
-		y: 4960995.063877211,
-		z: 3033243.3860652596
+		heading: 5.3667054272961,
+		pitch:-0.4175389978408426,
+		roll: 6.283185307179426,
+		x:-1884005.566011381,
+		y: 4890525.046005597,
+		z: 3640565.2938868324,
+		time:3
 	},
 	dataServers: {
-		//http://www.supermapol.com/realspace/services/data-cbd/rest/data/featureResults.rjson?returnContent=true
-		url: 'http://localhost:8090/iserver/services/data-ZhongTiaoShanSuiDao/rest/data/featureResults.rjson?returnContent=true',
-		dataSourceName: '中条山隧道空间数据库(WGS84)',
-		dataSets: {
-			中条山隧道主洞右线模型_出口_1: '中条山隧道主洞右线模型_出口_1',
-			中条山隧道主洞右线模型_洞身_1: '中条山隧道主洞右线模型_洞身_1',
-			中条山隧道主洞右线模型_进口_1: '中条山隧道主洞右线模型_进口_1',
-			中条山隧道主洞左线模型_出口_1: '中条山隧道主洞左线模型_出口_1',
-			中条山隧道主洞左线模型_洞身_1: '中条山隧道主洞左线模型_洞身_1',
-			中条山隧道主洞左线模型_进口_1: '中条山隧道主洞左线模型_进口_1'
+		url: 'http://localhost:8090/iserver/services/data-SuiDaomodel/rest/data/featureResults.rjson?returnContent=true',
+	}
 
-		}
-	},
-	PathAnalysisurl: 'http://localhost:8090/iserver/services/PathAnalysisExtension/rest/domainComponents/PathAnalysisExtension/pathAnalysisResult.json'
 }
+var customTreedata = [{
+		text: '中条山隧道',
+		state: {
+			checked: true,
+			selectable: false
+		},
+		nodes: [{
+				text: '主洞右线模型_出口',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '主洞右线模型_洞身',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '主洞右线模型_进口',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '主洞左线模型_出口',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '主洞左线模型_洞身',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '主洞左线模型_进口',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '一号斜井模型',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '二号斜井模型',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '三号斜井模型',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '四号斜井模型',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '六号斜井模型',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '平导模型',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			}
+		]
+	},
+	{
+		text: '集义隧道',
+		state: {
+			checked: true,
+			selectable: false
+		},
+		nodes: [{
+				text: '主洞_进口',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '主洞_洞身',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '主洞_出口',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '竖井',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '四号竖井',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '三号斜井_洞身',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '三号斜井_洞口',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '三号竖井',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '二号斜井_洞身',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '二号斜井_洞口',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '二号竖井',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '一号斜井_洞身',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '一号斜井_洞口',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			},
+			{
+				text: '一号竖井',
+				state: {
+					checked: true,
+					selectable: false
+				}
+			}
+		]
+	}
+]

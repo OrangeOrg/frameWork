@@ -123,7 +123,7 @@ Orange.WGmap3D = function(ContainerID, parameter) {
 				appendlayerattribute: function(layers) {
 					var that = this;
 					//this.layers=layers;
-					layers.forEach(layer => {
+					layers.forEach( function(layer){
 						layer["layer3DType"] = that.getLayerType(layer);
 						switch(layer["layer3DType"]) {
 							case 2:
@@ -181,7 +181,7 @@ Orange.WGmap3D = function(ContainerID, parameter) {
 
 						}
 						treeData.push(TerrainLayer);
-						that.layers.forEach(layer => {
+						that.layers.forEach(function(layer) {
 							var layer3DType = layer.layer3DType;
 							switch(layer3DType) {
 								case 2:
@@ -214,6 +214,261 @@ Orange.WGmap3D = function(ContainerID, parameter) {
 						})
 						return treeData;
 
+					}
+
+				},
+				buildCustomLayersTree: function(a, b, c) { //a传入containerDOMID，基于bootstrap创建,b为实例化的WGmap3D对象，c为treedata
+					var that = this;
+					var nameStr = "#" + a;
+					$(nameStr).empty();
+					var layetreediv = $('<div></div>'); //创建一个子div
+					layetreediv.attr('id', 'layerTree'); //给子div设置id
+					layetreediv.addClass('treeview'); //添加css样式
+
+					$(nameStr).append(layetreediv);
+					//var layerTreeData = this.getLayersTreeData();
+					if(c) {
+						$('#layerTree').treeview({
+							data: c,
+							checkedIcon: "glyphicon glyphicon-check",
+							backColor: "#071D32",
+							color: "#fff",
+							selectedColor: "#21F2F3",
+
+							onhoverColor: "#07A3EE",
+							//showBorder:false,
+							multiSelect: false,
+							showCheckbox: true,
+							onNodeChecked: function(event, node) { //选中节点
+								if(node.parentId !== undefined) {
+
+									$("#layerTree").treeview("checkNode", [node.parentId, {
+										silent: true
+									}]);
+									var parentNode = $("#layerTree").treeview("getNode", node.parentId);
+									var layername = node.text + '@' + parentNode.text
+
+									var layer = that.getLayer(layername);
+									if(layer) {
+										var layerType = layer.layer3DType;
+										switch(layerType) {
+											case 0:
+												layer.show = true;
+												break;
+											case 1:
+												break;
+											case 2:
+												layer.visible = true;
+												break;
+										}
+									}
+
+								} else { //checked的是主节点
+
+									var ChildNodesUncheck = getChildNodeUncheck(node);
+									if(ChildNodesUncheck) {
+										ChildNodesUncheck.nodes.forEach(function(node) {
+											var parentNode = $("#layerTree").treeview("getNode", node.parentId);
+											var layername = node.text + '@' + parentNode.text
+
+											var layer = that.getLayer(layername);
+											if(layer) {
+												var layerType = layer.layer3DType;
+												switch(layerType) {
+													case 0:
+														layer.show = true;
+														break;
+													case 1:
+														break;
+													case 2:
+														layer.visible = true;
+														break;
+												}
+
+											}
+
+										})
+										$('#layerTree').treeview('checkNode', [ChildNodesUncheck.nodesID, {
+											silent: true
+										}]);
+
+									}
+
+								}
+
+							},
+							onNodeUnchecked: function(event, node) {
+								//判断取消选中节点
+								if(node.parentId !== undefined) {
+
+									setParentNodeCheck(node);
+
+									var parentNode = $("#layerTree").treeview("getNode", node.parentId);
+									var layername = node.text + '@' + parentNode.text
+
+									var layer = that.getLayer(layername);
+									if(layer) {
+										var layerType = layer.layer3DType;
+										switch(layerType) {
+											case 0:
+												layer.show = false;
+												break;
+											case 1:
+												break;
+											case 2:
+												layer.visible = false;
+												break;
+										}
+									}
+
+								} else {
+									var ChildNodeschecked = getChildNodechecked(node);
+									//var ChildNodes=getChildNodeIdArr(node);
+									if(ChildNodeschecked) {
+										ChildNodeschecked.nodes.forEach(function(node) {
+											var parentNode = $("#layerTree").treeview("getNode", node.parentId);
+											var layername = node.text + '@' + parentNode.text
+
+											var layer = that.getLayer(layername);
+											if(layer) {
+												var layerType = layer.layer3DType;
+												switch(layerType) {
+													case 0:
+														layer.show = false;
+														break;
+													case 1:
+														break;
+													case 2:
+														layer.visible = false;
+														break;
+												}
+
+											}
+
+										})
+										$('#layerTree').treeview('uncheckNode', [ChildNodeschecked.nodesID, {
+											silent: true
+										}]);
+									}
+
+								}
+
+							},
+							onNodeSelected: function(event, node) //节点选中事件
+							{
+
+								if(node.parentId !== undefined) {
+									var parentNode = $("#layerTree").treeview("getNode", node.parentId);
+									var layername = node.text + '@' + parentNode.text
+
+									var layer = that.getLayer(layername);
+									if(typeof b === 'object') {
+										b.viewer.flyTo(layer, {
+											duration: 2
+										});
+									}
+
+								}
+
+							}
+
+						});
+
+					}
+					// 选中父节点时，选中所有子节点
+					function getChildNodeIdArr(node) {
+						var ts = [];
+						if(node.nodes) {
+							for(x in node.nodes) {
+								ts.push(node.nodes[x].nodeId);
+								if(node.nodes[x].nodes) {
+									var getNodeDieDai = getChildNodeIdArr(node.nodes[x]);
+									for(j in getNodeDieDai) {
+										ts.push(getNodeDieDai[j]);
+									}
+								}
+							}
+						} else {
+							ts.push(node.nodeId);
+						}
+						return ts;
+					}
+
+					// 获取子节点中选中的节点
+					function getChildNodechecked(node) {
+						if(node.nodes) {
+							var ts = {
+								nodesID: [],
+								nodes: []
+							}; //当前节点子集中未被选中的集合
+							for(x in node.nodes) {
+								if(node.nodes[x].state.checked) {
+									ts.nodesID.push(node.nodes[x].nodeId);
+									ts.nodes.push(node.nodes[x]);
+								}
+								if(node.nodes[x].nodes) {
+									var getNodeDieDai = node.nodes[x];
+									//console.log(getNodeDieDai);
+									for(j in getNodeDieDai) {
+										if(getNodeDieDai.nodes[x].state.checked) {
+											ts.push(getNodeDieDai[j]);
+										}
+									}
+								}
+							}
+						}
+						return ts;
+					}
+					// 获取子节点中未选中的节点
+					function getChildNodeUncheck(node) {
+						if(node.nodes) {
+							var ts = {
+								nodesID: [],
+								nodes: []
+							}; //当前节点子集中未被选中的集合
+							for(x in node.nodes) {
+								if(!node.nodes[x].state.checked) {
+									ts.nodesID.push(node.nodes[x].nodeId);
+									ts.nodes.push(node.nodes[x]);
+								}
+								if(node.nodes[x].nodes) {
+									var getNodeDieDai = node.nodes[x];
+									//console.log(getNodeDieDai);
+									for(j in getNodeDieDai) {
+										if(!getNodeDieDai.nodes[x].state.checked) {
+											ts.push(getNodeDieDai[j]);
+										}
+									}
+								}
+							}
+						}
+						return ts;
+					}
+
+					// 选中所有子节点时，选中父节点 取消子节点时取消父节点
+					function setParentNodeCheck(node) {
+						var parentNode = $("#layerTree").treeview("getNode", node.parentId);
+						if(parentNode.nodes) {
+							var checkedCount = 0;
+							for(x in parentNode.nodes) {
+								if(parentNode.nodes[x].state.checked) {
+									checkedCount++;
+								}
+							}
+							if(checkedCount == parentNode.nodes.length) { //如果子节点全部被选 父全选
+								//$("#tree").treeview("checkNode", parentNode.nodeId);
+								//setParentNodeCheck(parentNode);
+							} else if(checkedCount > 0 && checkedCount !== parentNode.nodes.length) { //如果子节点未全部被选 父未全选
+								//$('#tree').treeview('checkNode', parentNode.nodeId);
+								//setParentNodeCheck(parentNode);
+							} else if(checkedCount === 0) //子节点全部取消，父节点也取消选中
+							{
+								$('#layerTree').treeview('uncheckNode', [parentNode.nodeId, {
+									silent: true
+								}]);
+							}
+
+						}
 					}
 
 				},
@@ -265,7 +520,7 @@ Orange.WGmap3D = function(ContainerID, parameter) {
 
 									var ChildNodesUncheck = getChildNodeUncheck(node);
 									if(ChildNodesUncheck) {
-										ChildNodesUncheck.nodes.forEach(node => {
+										ChildNodesUncheck.nodes.forEach( function(node) {
 											var layer = that.getLayer(node.text);
 											if(layer) {
 												var layerType = layer.layer3DType;
@@ -317,7 +572,7 @@ Orange.WGmap3D = function(ContainerID, parameter) {
 									var ChildNodeschecked = getChildNodechecked(node);
 									//var ChildNodes=getChildNodeIdArr(node);
 									if(ChildNodeschecked) {
-										ChildNodeschecked.nodes.forEach(node => {
+										ChildNodeschecked.nodes.forEach(function(node){
 											var layer = that.getLayer(node.text);
 											if(layer) {
 												var layerType = layer.layer3DType;
@@ -472,6 +727,7 @@ Orange.WGmap3D = function(ContainerID, parameter) {
 
 					}
 				},
+
 				layer3DType: {
 					IMANGERY: 0,
 					TERRAIN: 1,

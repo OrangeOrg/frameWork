@@ -28,25 +28,19 @@ function onload() {
 
 	$("#userLoginName", parent.document).text(loginName)
 
-	//http://localhost:8090/iserver/services/3D-GAscene/rest/realspace
-	//http://support.supermap.com.cn:8090/iserver/services/3D-CBD/rest/realspace
 	var promise = WGmap3D.scene.openScene(dataConfig.sceneUrl);
 	promise.then(function(layers) {
 		WGmap3D.viewer.zoomTo(layers[0])
-		var cameraobj = {
-			heading: 0.4524677227269258,
-			pitch: -0.3371180128131013,
-			roll: 6.283185307121734,
-			x: -2623878.6953883013,
-			y: 4960995.063877211,
-			z: 3033243.3860652596
-		}
-		WGmap3D.scene.setViewCameraObj(cameraobj)
+
+		//WGmap3D.scene.setViewCameraObj(dataConfig.cameraobj)
+
+		//WGmap3D.scene.flytoCameraObj(dataConfig.cameraobj);
+		//WGmap3D.scene.layer3Ds.buildCustomLayersTree("treeContiner", WGmap3D, customTreedata);
 
 		WGmap3D.scene.layer3Ds.buildLayersTree("treeContiner", WGmap3D);
 		var layersTreeData = WGmap3D.scene.layer3Ds.getLayersTreeData();
 		var s3mlayersName = [];
-		layersTreeData[0].nodes.forEach(node => {
+		layersTreeData[0].nodes.forEach(function(node) {
 			s3mlayersName.push(node.text);
 		})
 		addlayerSelect('layerSelect', s3mlayersName);
@@ -98,7 +92,6 @@ function onload() {
 		var R = $('#circleR').val();
 		var backPoint = calculateCircle(centerPoint, R);
 		addPolygon(backPoint.point3Ds);
-		//var geocircle = new SuperMap.Geometry.Polygon([new SuperMap.Geometry.LinearRing(backPoint.point2Ds)]);
 		queryByPolygon(backPoint.point2Ds, '建筑');
 	});
 	handlerPolygon = new Cesium.DrawHandler(WGmap3D.viewer, Cesium.DrawMode.Polygon);
@@ -347,7 +340,7 @@ var addlayerSelect = function(a, b) {
 
 	}
 }
-var updataqueryInfoPanel = function(a, b) {
+var updataqueryInfoPanel = function(a, b,c) {
 	if(a.length > 0) {
 		var updatainnerHtml = "";
 		for(var i = 0, len = a.length; i < len; i++) {
@@ -376,8 +369,8 @@ var updataqueryInfoPanel = function(a, b) {
 					rectangle: {
 						coordinates: Cesium.Rectangle.fromDegrees(parseFloat(xmin), parseFloat(ymin), parseFloat(xmax), parseFloat(ymax)),
 						material: Cesium.Color.BLUE.withAlpha(0.5),
-						extrudedHeight: parseFloat(bottom) + parseFloat(h) + 20,
-						height: parseFloat(bottom) + 20,
+						extrudedHeight: parseFloat(bottom) + parseFloat(h) + c,
+						height: parseFloat(bottom) + c,
 						outline: true,
 						outlineColor: Cesium.Color.BLACK
 					}
@@ -627,17 +620,34 @@ function getFeatureBysqlLike() {
 
 //点击sql查询
 function getFeatureBysql(selection, position) {
-	//暂时只指定固定的一个数据，后期根据数据进行判断
-	var dataSetName = selection.layer.Caption
+
+	/********通过图层名@判断数据类型，有@为桌面切的场景缓存，无@认为是倾斜模型，倾斜模型单体化查询需要重新制定查询条件**********/
+	var layerName = selection.layer.layerName;
+	if(layerName.indexOf('@') > -1) {
+		var dataInfo = layerName.split('@');
+		var dataSetName = dataInfo[0];
+		var dataSourceName = dataInfo[1];
+		
+		var dataUrl = dataConfig.dataServers.baseMOdeldataServer.url;
+
+	} else {
+		var dataInfo = dataConfig.dataServers.TiltmodeldataServer[layerName];
+		if(dataInfo !== undefined) {
+			var dataSetName = dataInfo.dataSetName;
+			var dataSourceName = dataInfo.dataSourceName;
+			var dataUrl=dataInfo.url;
+		}
+
+	}
 
 	var queryObj = {
 		"getFeatureMode": "ID",
-		"datasetNames": [dataConfig.dataServers.dataSourceName + ":" + dataSetName],
+		"datasetNames": [dataSourceName + ":" + dataSetName],
 		"ids": [selection.ID]
 	};
 
 	var queryObjJson = JSON.stringify(queryObj);
-	var dataUrl = dataConfig.dataServers.url;
+	
 
 	$.ajax({
 		type: "post",
@@ -660,34 +670,8 @@ function getFeatureBysql(selection, position) {
 		},
 		error: function(msg) {
 			console.log(msg);
+			sceneBubble.containe.hide();
 		}
-	})
-
-}
-
-//飞行路线选择，开始飞行
-var sceneFlyClick = function() {
-	if(WGmap3D.flyManager !== undefined) {
-		WGmap3D.flyManager.stop();
-		WGmap3D.flyManager = null;
-		WGmap3D.flyRoutes = null;
-
-	}
-	WGmap3D.flyRoutes = new Cesium.RouteCollection();
-	WGmap3D.flyManager = new Cesium.FlyManager({
-		scene: WGmap3D.scene,
-		routes: WGmap3D.flyRoutes
-	});
-	var fpfFileName = $('#flyRouteSelect').selectpicker('val');
-	if(fpfFileName !== '') {
-		var fpfFileurl = './data/flyRoutes/' + fpfFileName + '.fpf'
-		WGmap3D.flyRoutes.fromFile(fpfFileurl)
-	}
-	Cesium.when(WGmap3D.flyRoutes.readyPromise, function() {
-		Cesium.when(WGmap3D.flyManager.readyPromise, function() {
-			WGmap3D.flyManager.playRate = 10;
-			WGmap3D.flyManager.play();
-		})
 	})
 
 	//	$('#pauseFly').click(function() {
@@ -708,25 +692,24 @@ var sceneFlyClick = function() {
 var addphotoSphereMaker = function() {
 	for(var i = 0, len = photoSpherePoints.length; i < len; i++) {
 		var photoSpherePoint = photoSpherePoints[i];
+		var imageFileName = photoSpherePoint.properties.IMGNUM;
+		while(imageFileName.length < 5) {
+			imageFileName = '0' + imageFileName;
+		}
+		imageFileName='G'+imageFileName+'.jpg';
+		var photoSphereUrl = photoSphereBaseurl+imageFileName;
 
 		var photoSpheremakerEntity = WGmap3D.viewer.entities.add({
-			position: Cesium.Cartesian3.fromDegrees(photoSpherePoint.position.x, photoSpherePoint.position.y, photoSpherePoint.position.z),
+			position: Cesium.Cartesian3.fromDegrees(photoSpherePoint.geometry.coordinates[0], photoSpherePoint.geometry.coordinates[1], photoSpherePoint.properties.Z),
 			billboard: {
 				image: './images/sxtimg.png',
 				pixelOffset: new Cesium.Cartesian2(0, -30),
-				scale: 0.2
-			},
-			label: {
-				text: photoSpherePoint.name,
-				font: '24px sans-serif',
-				horizontalOrigin: 1,
-				outlineColor: new Cesium.Color(0, 0, 0, 1),
-				outlineWidth: 2,
-				pixelOffset: new Cesium.Cartesian2(30, -30),
-				style: Cesium.LabelStyle.FILL
+				scale: 0.15,
+				distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 400)
 			},
 			show: false,
-			description: photoSpherePoint.photoSphereUrl + '?' + photoSpherePoint.description
+			
+			description: photoSphereUrl + '?' + photoSpherePoint.properties.description
 		});
 		photoSphereMakerCollection.push(photoSpheremakerEntity);
 
@@ -735,7 +718,7 @@ var addphotoSphereMaker = function() {
 
 //切换到街景，显示街景图标
 var photoSphereBtn_Click = function() {
-	photoSphereMakerCollection.forEach(Entity => {
+	photoSphereMakerCollection.forEach(function(Entity) {
 		Entity.show === false ? (
 			Entity.show = true,
 			photoSphereMakerSelect(true)

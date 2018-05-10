@@ -26,6 +26,18 @@ body,
 	background-color: rgba(0, 0, 255, 0);
 }
 
+.treeview {
+	max-height: 700px;
+	overflow-x: hidden;
+	overflow-y: scroll;
+	overflow: -moz-scrollbars-none;
+	-ms-overflow-style: none;
+}
+
+.treeview::-webkit-scrollbar {
+	width: 0 !important
+}
+
 .panel-default {
 	background: #071D32;
 	opacity: 0.8;
@@ -83,15 +95,18 @@ body,
 	color: #07A3EE;
 	background: #071D32;
 }
-.btn-default:focus{
+
+.btn-default:focus {
 	background: #071D32;
 	color: #07A3EE;
 }
-.btn-default:active{
+
+.btn-default:active {
 	background: #071D32;
 	color: #07A3EE;
 }
-.btn-default:visited{
+
+.btn-default:visited {
 	background: #071D32;
 	color: #07A3EE;
 }
@@ -410,7 +425,8 @@ a.list-group-item:focus {
 .l-popup .l-popup-table {
 	border: 2px solid #4d9ff4;
 }
-.networkAnalysisBtn:before{
+
+.networkAnalysisBtn:before {
 	font-family: FontAwesome;
 	content: "\f1aa";
 }
