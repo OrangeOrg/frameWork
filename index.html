@@ -178,10 +178,10 @@
 									<span>
         								<button class="btn btn-default" id="drawStartMaker" type="button">起点设置</button>
       								</span>
-      								<br />
+									<br />
 									<div class="input-group">
 										<span class="input-group-addon">x</span>
-										<input type="text" class="form-control" id="startPointx"  placeholder="起点经度" aria-describedby="sizing-addon2">
+										<input type="text" class="form-control" id="startPointx" placeholder="起点经度" aria-describedby="sizing-addon2">
 									</div>
 									<br />
 									<div class="input-group">
@@ -195,7 +195,7 @@
 									<span>
         								<button class="btn btn-default" id="drawEndMaker" type="button">终点设置</button>
       								</span>
-      								<br />
+									<br />
 									<div class="input-group">
 										<span class="input-group-addon">x</span>
 										<input type="text" class="form-control" id="endPointx" placeholder="终点经度" aria-describedby="sizing-addon2">
@@ -345,6 +345,30 @@
 				</div>-->
 
 			</div>
+		</div>
+
+		<div style="position: absolute;width: 400px;left: 300px;top: 100px;height: 200px; background-color: #FFFFFF;padding: 10px 10px; 10px; 10px;;">
+			资源管理器
+			<!-- Nav tabs -->
+			<ul class="nav nav-tabs" role="tablist">
+				<li role="presentation" class="active">
+					<a href="#basedata" aria-controls="basedata" role="tab" data-toggle="tab">基础地理</a>
+				</li>
+				<li role="presentation">
+					<a href="#SDMode" aria-controls="SDMode" role="tab" data-toggle="tab">隧道模型</a>
+				</li>
+				<li role="presentation">
+					<a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">其他数据</a>
+				</li>
+			</ul>
+
+			<!-- Tab panes -->
+			<div class="tab-content">
+				<div role="tabpanel" class="tab-pane in active" id="basedata">基础地理</div>
+				<div role="tabpanel" class="tab-pane" id="SDMode">隧道模型</div>
+				<div role="tabpanel" class="tab-pane" id="messages">其他数据</div>
+			</div>
+
 		</div>
 
 		<script src="js/bootstrap-3.3.7-dist/js/jquery.min.3.2.1.js"></script>
